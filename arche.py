@@ -21,6 +21,7 @@ import archeio.solution
 import archetech.smr
 import archetech.techmagic  
 import archetech.mimd
+import archetech.mimdSA as mimdSA
 import logging
 
 history_file = os.path.expanduser('~/.arche_history')
@@ -213,10 +214,11 @@ class ArcheTech(Cmd):
     mimdParser.add_argument('-cs', '--checksol', action='store_true')
     mimdParser.add_argument('-v', '--verbose', action='store_true')
     @cmd2.with_argparser(mimdParser)
+
     def do_mimd(self,arg):
         ''' maps two or more functions using MAGIC operation.
             Each function is mapped to  a single row.
-            The method uses Z3 to maximimze parallel operations for the input functions and reduce delay. Secondary goal to minimize number of colors used. '''
+            The method uses Z3 to maximize parallel operations for the input functions and reduce delay. Secondary goal to minimize number of colors used. '''
         if arg.files == None or len(arg.files) < 2:
             print('two or more benchmark files required for mimd')
             return 
@@ -266,9 +268,23 @@ class ArcheTech(Cmd):
             with open(self.__logFile, 'a') as fp:
                 json.dump(self.__sol.getSolution(), fp)
                 fp.write('\n')     
-        
-        
-        
+
+    mimdSAParser = argparse.ArgumentParser()
+    mimdSAParser.add_argument('-f','--files', type=str, nargs='+')
+    mimdSAParser.add_argument('-o','--output', type=str)
+    @cmd2.with_argparser(mimdSAParser)
+    def do_mimdSA(self, arg):
+        '''Maps two or more graphs using a Simulated Annealing wrapper'''
+        if arg.files == None or len(arg.files) < 2:
+            print('two or more benchmark files required for mimd')
+            return 
+        if arg.output == None:
+            print('Output file must be specified')
+            return 
+        techMapper = archetech.mimdSA.MIMDSA(arg.files, len(arg.files), arg.output)
+        techMapper.readGraph()
+        techMapper.genSolution()        
+
     def _onchange_dev(self, old, new):
         # change the voltage params based on device
         if new == '1S1R':
