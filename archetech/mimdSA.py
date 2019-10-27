@@ -3,7 +3,10 @@ import sys
 import copy
 import timeit
 
-from simanneal import Annealer
+import os
+sys.path.append(os.path.abspath(".."))
+
+from .lib.anneal import Annealer
 from sortedcontainers import SortedList
 from igraph import *
 
@@ -701,6 +704,7 @@ class MIMDSA:
         sol.Tmin = 0.01
         sol.steps = 50000
         sol.updates = 100
+        sol.Timeout = 21600.0
         itinerary, fitness = sol.anneal()
 
         apex = itinerary[0][0]
@@ -740,7 +744,7 @@ class MIMDSA:
 if __name__ == '__main__':
 
     if len(sys.argv) < 3:
-        print("Usage: python mimdMov.py <File name of graph1> <File name of graph2> ... (at least 2 files)\n")
+        print("Usage: python mimdSA.py <File name of graph1> <File name of graph2> ... (at least 2 files)\n")
         sys.exit()
 
     techMapper = MIMDSA(sys.argv[1:len(sys.argv)-1], len(sys.argv)-1, sys.argv[len(sys.argv)-1])
